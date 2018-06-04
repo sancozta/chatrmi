@@ -41,6 +41,35 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerInt {
 
     }
 
+    //VALIDAR NICKNAME
+    public boolean nickisvalid(String nickname) {
+
+        boolean isvalid = true;
+
+        for (int i = 0; i < users.size(); i++) {
+            try {
+
+                //CAPTURANDO PROXIMO USUARIO DA LISTA
+                ChatClientInt user = (ChatClientInt) users.get(i);
+
+                //VERIFICANDO IGUALDADE
+                if (nickname.equals(user.getname())) {
+                    isvalid = false;
+                    break;
+                }
+
+            } catch (Exception e) {
+
+                //LOG
+                System.out.println("[server] Erro verificar nickname !");
+
+            }
+        }
+
+        return isvalid;
+
+    }
+
     //RETIRAR SESSAO DO USUARIO
     @Override
     public boolean logout(ChatClientInt user) throws RemoteException {
@@ -98,6 +127,35 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerInt {
 
                 //ENVIANDO MENSSAGEM PARA USUARIO
                 user.sendmessage(msg);
+
+            } catch (Exception e) {
+
+                //LOG
+                System.out.println("[server] Erro ao enviar messagem de cliente !");
+
+            }
+        }
+
+    }
+
+    //ENVIAR MENSAGEM PRIVADA PARA USUARIO
+    @Override
+    public void sendprivate(ChatClientInt usersend, String msg) {
+
+        String nick = msg.substring(0, msg.indexOf(":"));
+        System.out.println("[server] Usuario " + nick + " identificado !");
+
+        for (int i = 0; i < users.size(); i++) {
+            try {
+
+                //CAPTURANDO PROXIMO USUARIO DA LISTA
+                ChatClientInt user = (ChatClientInt) users.get(i);
+
+                //ENVIANDO MENSSAGEM PARA USUARIO
+                if (nick.equals(user.getname())) {
+                    usersend.sendmessage("["+usersend.getname()+"] "+msg.substring(msg.indexOf(":")+1));
+                    user.sendmessage("["+usersend.getname()+"] "+msg.substring(msg.indexOf(":")+1));
+                }
 
             } catch (Exception e) {
 

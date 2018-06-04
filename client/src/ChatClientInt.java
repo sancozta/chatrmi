@@ -10,7 +10,7 @@ public interface ChatClientInt extends Remote {
     public boolean sendfile(String filename, byte[] data, int len) throws RemoteException;
     
     //VERIFICAR RECEBIMENTO DE ARQUIVO
-    public boolean receivefile(ChatServerInt a, String filename) throws RemoteException;
+    public boolean receivefile(ChatServerInt user, String filename) throws RemoteException;
     
     //RETORNA O NOME DO CLIENTE
     public String getname() throws RemoteException;

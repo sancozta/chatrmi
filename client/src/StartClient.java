@@ -6,6 +6,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class StartClient {
 
@@ -22,7 +24,7 @@ public class StartClient {
     public JTextField sendbox, ipconect, nameconect;
 
     //BUTTOM DE CONEXAO
-    public JButton bconnect, bsendbox, bsendfile, breceivefile;
+    public JButton bconnect, bsendbox, bsendprivate, bsendfile, breceivefile;
 
     //COMPONETE PARA LISTAR USUARIOS LOGADOS
     public JList listconnected;
@@ -72,20 +74,30 @@ public class StartClient {
                 //ENCOTRANDO O SERVIDOR
                 server = (ChatServerInt) Naming.lookup("rmi://" + ipconect.getText().toLowerCase() + "/chat");
 
-                //REALIZANDO A CONEXAO COM O SERVIDOR
-                server.login(client);
+                //VALIDAR NICKNAME
+                if (server.nickisvalid(nameconect.getText().toLowerCase())) {
+                    
+                    //REALIZANDO A CONEXAO COM O SERVIDOR
+                    server.login(client);
 
-                //ATUALIZAR USUARIOS CONECTADOS
-                updatelist(server.getconnected());
+                    //ATUALIZAR USUARIOS CONECTADOS
+                    updatelist(server.getconnected());
 
-                //MUDAR FUNCAO DO BUTTON
-                bconnect.setText("Desconectar");
+                    //MUDAR FUNCAO DO BUTTON
+                    bconnect.setText("Desconectar");
 
-                //BLOQUEANDO INPUT
-                nameconect.setEditable(false);
+                    //BLOQUEANDO INPUT
+                    nameconect.setEditable(false);
 
-                //BLOQUEANDO INPUT
-                ipconect.setEditable(false);
+                    //BLOQUEANDO INPUT
+                    ipconect.setEditable(false);
+                    
+                } else {
+                
+                    //NOTIFICACAO PARA O USUARIO
+                    notication("Nickname já existe, escolha outro!");
+                    
+                }
 
             } catch (Exception err) {
 
@@ -218,9 +230,10 @@ public class StartClient {
         //BUTTONS
         bconnect = new JButton("Conectar");
         bsendbox = new JButton("Enviar Mensagem");
+        bsendprivate = new JButton("Enviar Mensagem Privada");
         bsendfile = new JButton("Baixar Arquivo");
         breceivefile = new JButton("Enviar Arquivo");
-
+        
         //TEXTS
         ipconect = new JTextField();
         sendbox = new JTextField();
@@ -274,6 +287,7 @@ public class StartClient {
         //LAYOUT DE BAIXO
         bottom.add(sendbox);
         bottom.add(bsendbox);
+        bottom.add(bsendprivate);
         bottom.add(bsendfile);
         bottom.add(breceivefile);
 
@@ -297,6 +311,18 @@ public class StartClient {
             }
         });
 
+        //OUVINTE PARA BOTAO DE ENVIO PRIVADO
+        bsendprivate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    server.sendprivate(client, sendbox.getText());
+                    sendbox.setText("");
+                } catch (RemoteException err) {
+                    err.printStackTrace();
+                }
+            }
+        });
+        
         //OUVINTE DO BOTAO DE BAIXAR ARQUIVO
         bsendfile.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
