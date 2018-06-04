@@ -6,8 +6,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class StartClient {
 
@@ -115,6 +113,9 @@ public class StartClient {
 
                 //RETIRAR SESSAO DO USUARIO
                 server.logout(client);
+                
+                //LISTA LISTA DO USA
+                updatelist(null);
 
             } catch (Exception err) {
 
