@@ -356,8 +356,8 @@ public class StartClient {
 
         //DEFINIDO PROPRIEDADES DA JANELA
         frame.setContentPane(main);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setUndecorated(true);
+        frame.setSize(800, 500);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
     }
