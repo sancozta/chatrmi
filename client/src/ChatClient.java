@@ -1,3 +1,4 @@
+
 import java.util.*;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
@@ -6,10 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class ChatClient extends UnicastRemoteObject implements ChatClientInt {
-    
+
     //NOME DO USUARIO
     private String name;
-    
+
     //INTERFACE DO CHAT
     private StartClient gui;
 
@@ -23,27 +24,27 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientInt {
     public void sendmessage(String msg) throws RemoteException {
         this.gui.writepanel(msg);
     }
-    
+
     //ATUALIZAR PESSOAS ONLINE
     @Override
     public void updatelist(Vector users) throws RemoteException {
         this.gui.updatelist(users);
     }
-    
+
     //RETORNAR NOME DO USUARIO LOGADO
     @Override
     public String getname() throws RemoteException {
         return name;
     }
-    
+
     //REGISTRANDO INTERFACE
     public void setgui(StartClient gui) {
         this.gui = gui;
     }
-    
-    //ENVIANDO ARQUIVO
+
+    //RECEBENDO ARQUIVO ENVIADO
     @Override
-    public boolean sendfile(String filename, byte[] data, int len) throws RemoteException {
+    public boolean receivefile(String filename, byte[] data, int len) throws RemoteException {
 
         try {
 
@@ -66,7 +67,7 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientInt {
             out.close();
 
             //LOG DO SERVIDOR
-            System.out.println("[server] Um arquivo foi enviado !");
+            sendmessage("[server] Você recebeu o arquivo " + file.getName() + " !");
 
         } catch (Exception err) {
 
@@ -79,9 +80,9 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientInt {
 
     }
 
-    //ENVIANDO ARQUIVO PARA USUARIOS
+    //ENVIANDO ARQUIVO PARA USUARIOS CONECTADOS
     @Override
-    public boolean receivefile(ChatServerInt user, String filename) throws RemoteException {
+    public boolean sendfile(ChatServerInt server, String filename) throws RemoteException {
 
         try {
 
@@ -98,17 +99,47 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientInt {
             int len = in.read(data);
 
             if (len > 0) {
-                //ENVIANDO ARQUIVO
-                user.sendfile(file.getName(), data, len);
+
+                //SALVANDO O ARQUIVO NO SERVIDOR
+                server.receivefile(file.getName(), data, len);
+
+                //ENVIANDO ARQUIVO PARA OS USUARIOS CONECTADOS
+                Vector users = server.getconnected();
+
+                for (int i = 0; i < users.size(); i++) {
+                    try {
+
+                        //CAPTURANDO PROXIMO USUARIO DA LISTA
+                        ChatClientInt user = (ChatClientInt) users.get(i);
+
+                        //ENVIANDO MENSSAGEM PARA USUARIO
+                        if (!name.equals(user.getname())) {
+                            user.receivefile(file.getName(), data, len);
+                        }
+
+                    } catch (Exception err) {
+
+                        //EXCECOES
+                        err.printStackTrace();
+
+                        //PUBLICANDO MENSAGEM DE ERRO
+                        sendmessage("[server] Erro na tentativa de envio de arquivo !");
+
+                    }
+                }
+
             }
 
             //PUBLICANDO ENVIO DO ARQUIVO
-            user.publish("[" + name + "] Enviou um arquivo ! Arquivo: " + filename);
+            server.publish("[" + name + "] Enviei o arquivo " + file.getName() + " !");
 
         } catch (Exception err) {
 
+            //EXCECOES
+            err.printStackTrace();
+
             //PUBLICANDO MENSAGEM DE ERRO
-            user.publish("[server] Erro ao enviar arquivo para o servidor !");
+            sendmessage("[server] Erro na tentativa de envio de arquivo !");
 
             return false;
 
@@ -117,4 +148,5 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientInt {
         return true;
 
     }
+
 }

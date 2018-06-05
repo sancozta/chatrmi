@@ -153,8 +153,8 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerInt {
 
                 //ENVIANDO MENSSAGEM PARA USUARIO
                 if (nick.equals(user.getname())) {
-                    usersend.sendmessage("["+usersend.getname()+"] "+msg.substring(msg.indexOf(":")+1));
-                    user.sendmessage("["+usersend.getname()+"] "+msg.substring(msg.indexOf(":")+1));
+                    usersend.sendmessage("[" + usersend.getname() + "] " + msg.substring(msg.indexOf(":") + 1));
+                    user.sendmessage("[" + usersend.getname() + "] " + msg.substring(msg.indexOf(":") + 1));
                 }
 
             } catch (Exception e) {
@@ -167,9 +167,15 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerInt {
 
     }
 
-    //ENVIANDO ARQUIVO PUBLICAMENTE
+    //RETORNA USUARIOS CONECTADOS
     @Override
-    public boolean sendfile(String filename, byte[] data, int len) throws RemoteException {
+    public Vector getconnected() throws RemoteException {
+        return users;
+    }
+
+    //RECEBENDO ARQUIVO ENVIADO POR USUARIO
+    @Override
+    public boolean receivefile(String filename, byte[] data, int len) throws RemoteException {
 
         try {
 
@@ -192,60 +198,12 @@ public class ChatServer extends UnicastRemoteObject implements ChatServerInt {
             out.close();
 
             //LOG DO SERVIDOR
-            System.out.println("[server] Um arquivo foi enviado !");
+            System.out.println("[server] O servidor recebeu o arquivo " + file.getName() + " !");
 
         } catch (Exception err) {
 
             //LOG
             err.printStackTrace();
-
-        }
-
-        return true;
-
-    }
-
-    //RETORNA USUARIOS CONECTADOS
-    @Override
-    public Vector getconnected() throws RemoteException {
-        return users;
-    }
-
-    //FAZER DOWNLOAD DE ARQUIVO
-    @Override
-    public boolean receivefile(ChatClientInt user, String filename) throws RemoteException {
-
-        try {
-
-            //INSTANCIA UM ARQUIVO
-            File file = new File(filename);
-
-            //ABRE UM ARQUIVO PARA LEITURA DE DADOS
-            FileInputStream in = new FileInputStream(file);
-
-            //DETERMINANDO LIMITE DE LEITURA DO ARQUIVO
-            byte[] data = new byte[1024 * 1024];
-
-            //LENDO TAMANHO DO ARQUIVO
-            int len = in.read(data);
-
-            if (len > 0) {
-                //SALVANDO ARQUIVO PARA O USUARIO
-                user.sendfile(file.getName(), data, len);
-            }
-
-            //REGISTRANDO MESSAGE PARA O USUARIO
-            user.sendmessage("[message] O arquivo " + filename + " foi salvo !");
-
-        } catch (Exception err) {
-
-            //LOG DO SERVIDOR
-            System.out.println("[server] Erro ao retornar arquivo a usuario !");
-
-            //ENVIANDO MENSSAGEM AO USUARIO
-            user.sendmessage("[notice] Erro ao recuperar arquivo !");
-
-            return false;
 
         }
 

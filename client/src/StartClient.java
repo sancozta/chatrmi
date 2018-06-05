@@ -22,7 +22,7 @@ public class StartClient {
     public JTextField sendbox, ipconect, nameconect;
 
     //BUTTOM DE CONEXAO
-    public JButton bconnect, bsendbox, bsendprivate, bsendfile, breceivefile;
+    public JButton bconnect, bsendbox, bsendprivate, bsendfile;
 
     //COMPONETE PARA LISTAR USUARIOS LOGADOS
     public JList listconnected;
@@ -74,7 +74,7 @@ public class StartClient {
 
                 //VALIDAR NICKNAME
                 if (server.nickisvalid(nameconect.getText().toLowerCase())) {
-                    
+
                     //REALIZANDO A CONEXAO COM O SERVIDOR
                     server.login(client);
 
@@ -89,12 +89,12 @@ public class StartClient {
 
                     //BLOQUEANDO INPUT
                     ipconect.setEditable(false);
-                    
+
                 } else {
-                
+
                     //NOTIFICACAO PARA O USUARIO
                     notication("Nickname já existe, escolha outro!");
-                    
+
                 }
 
             } catch (Exception err) {
@@ -113,7 +113,7 @@ public class StartClient {
 
                 //RETIRAR SESSAO DO USUARIO
                 server.logout(client);
-                
+
                 //LISTA LISTA DO USA
                 updatelist(null);
 
@@ -232,9 +232,8 @@ public class StartClient {
         bconnect = new JButton("Conectar");
         bsendbox = new JButton("Enviar Mensagem");
         bsendprivate = new JButton("Enviar Mensagem Privada");
-        bsendfile = new JButton("Baixar Arquivo");
-        breceivefile = new JButton("Enviar Arquivo");
-        
+        bsendfile = new JButton("Enviar Arquivo");
+
         //TEXTS
         ipconect = new JTextField();
         sendbox = new JTextField();
@@ -290,7 +289,6 @@ public class StartClient {
         bottom.add(bsendbox);
         bottom.add(bsendprivate);
         bottom.add(bsendfile);
-        bottom.add(breceivefile);
 
         //LAYOUT RAIZ
         main.add(top, BorderLayout.NORTH);
@@ -323,30 +321,19 @@ public class StartClient {
                 }
             }
         });
-        
+
         //OUVINTE DO BOTAO DE BAIXAR ARQUIVO
         bsendfile.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String filename = sendbox.getText();
-                    server.receivefile(client, filename);
+                    client.sendfile(server, filename);
                 } catch (RemoteException e1) {
                     e1.printStackTrace();
                 }
             }
         });
-
-        //OUVINTE DO BOTAO DE ENVIAR ARQUIVO
-        breceivefile.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    client.receivefile(server, sendbox.getText());
-                } catch (RemoteException err) {
-                    err.printStackTrace();
-                }
-            }
-        });
-
+      
         //OUVINTE DO SENDBOX DE MENSAGENS
         sendbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

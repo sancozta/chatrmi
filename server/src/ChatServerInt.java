@@ -18,13 +18,10 @@ public interface ChatServerInt extends Remote {
     //ENVIA MESSAGEM PRIVATA PARA USUARIO UNICO
     public void sendprivate(ChatClientInt usersend, String msg) throws RemoteException;
     
-    //ENVIAR ARQUIVO
-    public boolean sendfile(String filename, byte[] data, int len) throws RemoteException;
-
-    //VERIFICAR RECEBIMENTO DE ARQUIVO
-    public boolean receivefile(ChatClientInt user, String filename) throws RemoteException;
-    
     //VERIFICAR CONEXAO E RETORNA USUARIO CONECTADOS
     public Vector getconnected() throws RemoteException;
+    
+    //RECEBER ARQUIVO DE USUARIO
+    public boolean receivefile(String filename, byte[] data, int len) throws RemoteException;
 
 }
